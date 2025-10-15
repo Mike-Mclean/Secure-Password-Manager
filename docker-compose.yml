@@ -1,0 +1,16 @@
+services:
+  database:
+    image: postgres:14.18-bookworm
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=password123
+      - POSTGRES_DB=django_db
+    networks:
+      - default
+    restart: unless-stopped
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+
+volumes:
+  dbdata:

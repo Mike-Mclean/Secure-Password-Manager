@@ -1,0 +1,23 @@
+### if running pgsql db in docker locally, this matches what;s in the docker compose file:
+DATABASE_URL=postgresql://postgres:password123@localhost:5432/django_db
+
+### if you have gcp auth proxy running, use this to connect to the cloud-based db
+DATABASE_URL=postgresql://django:s<GET PASSWORD FROM SLACK>@localhost:5432/password-vault
+DEBUG=True
+DJANGO_SETTINGS_MODULE=passwordmanager.settings.default
+MANAGE_PY_PATH=manage.py
+
+# SMTP_HOST=smtp.mailgun.org
+# SMTP_LOGIN=admin@sandboxb87e5012400141089ceed4bd84e3f6b5.mailgun.org
+# SMTP_PASSWORD=<get mailgun password from slack>
+# SMTP_API_KEY=<get mailgun api key from slack>
+
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_LOGIN=osusummer2025@gmail.com
+SMTP_PASSWORD=<get gmail password from slack>
+SMTP_API_KEY=none
+
+# SMS_FROM_NUMBER=<frmom twilio>
+# SMS_ACCOUNT_SID=<from twilio>
+# SMS_AUTH_TOKEN=<from twilio>
