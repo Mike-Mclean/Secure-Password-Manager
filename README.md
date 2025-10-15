@@ -1,4 +1,4 @@
-# OSUSecurePasswordManager
+# Secure Password Manager
 
 ## Development
 
