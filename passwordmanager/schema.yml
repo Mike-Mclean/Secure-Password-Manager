@@ -1,0 +1,1049 @@
+openapi: 3.0.3
+info:
+  title: Secure Password Manager API
+  version: 1.0.0
+  description: A secure password manager API with session authentication.
+paths:
+  /api/accounts/change-password/:
+    post:
+      operationId: accounts_change_password_create
+      description: |-
+        Allows users to change their password.
+        Requires the old password for verification.
+        If the old password is correct, the new password is set.
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangePassword'
+          description: ''
+  /api/accounts/check-user/:
+    get:
+      operationId: accounts_check_user_retrieve
+      tags:
+      - accounts
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckIdentifierAvailable'
+          description: ''
+  /api/accounts/credentials-login/:
+    post:
+      operationId: accounts_credentials_login_create
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthResponse'
+        required: true
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+          description: ''
+  /api/accounts/csrf/:
+    get:
+      operationId: accounts_csrf_retrieve
+      tags:
+      - accounts
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CSRFToken'
+          description: ''
+  /api/accounts/login/:
+    post:
+      operationId: accounts_login_create
+      description: |-
+        Django's session framework automatically handles:
+        - Secure session ID generation
+        - Session expiration
+        - Session rotation on authentication state changes
+        - HttpOnly cookies (when using cookie sessions)
+        - Secure flag for HTTPS
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SessionLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SessionLogin'
+        required: true
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionLogin'
+          description: ''
+  /api/accounts/logout/:
+    post:
+      operationId: accounts_logout_create
+      description: as long as the sessionid cookie is set in the request, this will
+        log the user out
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionLogout'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SessionLogout'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SessionLogout'
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionLogout'
+          description: ''
+  /api/accounts/mfa/challenge/:
+    post:
+      operationId: accounts_mfa_challenge_create
+      description: Starts the MFA challenge by sending a code to the user.
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartMFAChallenge'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StartMFAChallenge'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StartMFAChallenge'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartMFAChallenge'
+          description: ''
+  /api/accounts/mfa/email/enroll/:
+    post:
+      operationId: accounts_mfa_email_enroll_create
+      description: Sends an email with a token to verify MFA enrollment via email.
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollEmailMFARequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnrollEmailMFARequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnrollEmailMFARequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollEmailMFARequest'
+          description: ''
+  /api/accounts/mfa/email/verify/:
+    get:
+      operationId: accounts_mfa_email_verify_retrieve
+      description: Verifies the email link and enables MFA for the user.
+      tags:
+      - accounts
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyMFA'
+          description: ''
+  /api/accounts/mfa/totp/enroll/:
+    get:
+      operationId: accounts_mfa_totp_enroll_retrieve
+      description: |-
+        Starts the TOTP MFA enrollment by generating a secret key.
+        see https://pyauth.github.io/pyotp/#installation
+      tags:
+      - accounts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollTOTPMFARequest'
+          description: ''
+  /api/accounts/mfa/totp/verify/:
+    post:
+      operationId: accounts_mfa_totp_verify_create
+      description: |-
+        Verifies a TOTP MFA enrollment.
+        If user is already enrolled, it will enable TOTP MFA for MFA access.
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyTOTPMFARequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyTOTPMFARequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyTOTPMFARequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyTOTPMFARequest'
+          description: ''
+  /api/accounts/mfa/verify/:
+    post:
+      operationId: accounts_mfa_verify_create
+      description: Verifies the MFA challenge.
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyMFAChallenge'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyMFAChallenge'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyMFAChallenge'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyMFAChallenge'
+          description: ''
+  /api/accounts/register/:
+    post:
+      operationId: accounts_register_create
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+        required: true
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateUser'
+          description: ''
+  /api/accounts/userinfo/:
+    get:
+      operationId: accounts_userinfo_retrieve
+      description: Returns the user's information, including MFA status.
+      tags:
+      - accounts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoLookup'
+          description: ''
+  /api/vault/history/:
+    get:
+      operationId: vault_history_list
+      description: ViewSet for viewing vault item history (read-only).
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - vault
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVaultItemHistoryList'
+          description: ''
+  /api/vault/history/{id}/:
+    get:
+      operationId: vault_history_retrieve
+      description: ViewSet for viewing vault item history (read-only).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - vault
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultItemHistory'
+          description: ''
+  /api/vault/items/:
+    get:
+      operationId: vault_items_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - vault
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVaultItemListList'
+          description: ''
+    post:
+      operationId: vault_items_create
+      tags:
+      - vault
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VaultItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VaultItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VaultItem'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultItem'
+          description: ''
+  /api/vault/items/{id}/:
+    get:
+      operationId: vault_items_retrieve
+      description: Track access when retrieving a single item.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - vault
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultItem'
+          description: ''
+    put:
+      operationId: vault_items_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - vault
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VaultItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VaultItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VaultItem'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultItem'
+          description: ''
+    patch:
+      operationId: vault_items_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - vault
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVaultItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedVaultItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedVaultItem'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultItem'
+          description: ''
+    delete:
+      operationId: vault_items_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - vault
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/vault/items/{id}/restore/:
+    post:
+      operationId: vault_items_restore_create
+      description: Restore a soft-deleted vault item.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - vault
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VaultItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VaultItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VaultItem'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultItem'
+          description: ''
+  /api/vault/items/{id}/soft_delete/:
+    post:
+      operationId: vault_items_soft_delete_create
+      description: Soft delete a vault item.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - vault
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VaultItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VaultItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VaultItem'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultItem'
+          description: ''
+  /api/vault/items/deleted/:
+    get:
+      operationId: vault_items_deleted_retrieve
+      description: Get soft-deleted items.
+      tags:
+      - vault
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultItemList'
+          description: ''
+components:
+  schemas:
+    AuthResponse:
+      type: object
+      properties:
+        username:
+          type: string
+        sessionid:
+          type: string
+        csrftoken:
+          type: string
+      required:
+      - csrftoken
+      - sessionid
+      - username
+    CSRFToken:
+      type: object
+      properties:
+        csrftoken:
+          type: string
+      required:
+      - csrftoken
+    ChangePassword:
+      type: object
+      properties:
+        old_password:
+          type: string
+        new_password:
+          type: string
+        confirm_new_password:
+          type: string
+      required:
+      - confirm_new_password
+      - new_password
+      - old_password
+    CheckIdentifierAvailable:
+      type: object
+      properties:
+        q:
+          type: string
+          maxLength: 150
+      required:
+      - q
+    CreateUser:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+        confirm_password:
+          type: string
+          writeOnly: true
+      required:
+      - confirm_password
+      - email
+      - password
+    EnrollEmailMFARequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    EnrollTOTPMFARequest:
+      type: object
+      properties:
+        secret:
+          type: string
+          maxLength: 16
+      required:
+      - secret
+    ItemTypeEnum:
+      enum:
+      - password
+      - note
+      - other
+      type: string
+      description: |-
+        * `password` - Password
+        * `note` - Secure Note
+        * `other` - Other
+    MfaTypeEnum:
+      enum:
+      - email
+      - sms
+      type: string
+      description: |-
+        * `email` - email
+        * `sms` - sms
+    PaginatedVaultItemHistoryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VaultItemHistory'
+    PaginatedVaultItemListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VaultItemList'
+    PatchedVaultItem:
+      type: object
+      description: Serializer for VaultItem model.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user_info:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        title:
+          type: string
+          description: Descriptive title for the vault item
+          maxLength: 255
+        encrypted_data:
+          type: string
+          description: Base64 encoded encrypted string
+        encryption_algorithm:
+          type: string
+          description: Algorithm used for encryption
+          maxLength: 50
+        item_type:
+          $ref: '#/components/schemas/ItemTypeEnum'
+        description:
+          type: string
+          description: Optional description for the vault item
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the item was created
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the item was last updated
+        last_accessed:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: When the item was last accessed
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the item expires (optional)
+        soft_deleted:
+          type: boolean
+          description: Soft delete flag
+        is_expired:
+          type: boolean
+          readOnly: true
+    SessionLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
+    SessionLogout:
+      type: object
+      properties:
+        sessionid:
+          type: string
+        detail:
+          type: string
+          readOnly: true
+        success:
+          type: boolean
+          readOnly: true
+      required:
+      - detail
+      - success
+    StartMFAChallenge:
+      type: object
+      properties:
+        mfa_type:
+          $ref: '#/components/schemas/MfaTypeEnum'
+      required:
+      - mfa_type
+    User:
+      type: object
+      description: Serializer for Django User with minimal fields.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        email:
+          type: string
+          format: email
+          readOnly: true
+          title: Email address
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - date_joined
+      - email
+      - id
+      - username
+    UserInfoLookup:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+        mfa_enabled:
+          type: boolean
+        mfa_sms_enabled:
+          type: boolean
+        mfa_totp_enabled:
+          type: boolean
+      required:
+      - email
+    VaultItem:
+      type: object
+      description: Serializer for VaultItem model.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user_info:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        title:
+          type: string
+          description: Descriptive title for the vault item
+          maxLength: 255
+        encrypted_data:
+          type: string
+          description: Base64 encoded encrypted string
+        encryption_algorithm:
+          type: string
+          description: Algorithm used for encryption
+          maxLength: 50
+        item_type:
+          $ref: '#/components/schemas/ItemTypeEnum'
+        description:
+          type: string
+          description: Optional description for the vault item
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the item was created
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the item was last updated
+        last_accessed:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: When the item was last accessed
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the item expires (optional)
+        soft_deleted:
+          type: boolean
+          description: Soft delete flag
+        is_expired:
+          type: boolean
+          readOnly: true
+      required:
+      - created_at
+      - encrypted_data
+      - id
+      - is_expired
+      - last_accessed
+      - title
+      - updated_at
+      - user_info
+    VaultItemHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        vault_item:
+          type: string
+          format: uuid
+        vault_item_title:
+          type: string
+          readOnly: true
+        user_info:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        action:
+          type: string
+          description: Action performed on the item
+          maxLength: 50
+        details:
+          nullable: true
+          description: Additional details about the action
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - id
+      - timestamp
+      - user_info
+      - vault_item
+      - vault_item_title
+    VaultItemList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        title:
+          type: string
+          description: Descriptive title for the vault item
+          maxLength: 255
+        item_type:
+          $ref: '#/components/schemas/ItemTypeEnum'
+        description:
+          type: string
+          description: Optional description for the vault item
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the item was created
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the item was last updated
+        last_accessed:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: When the item was last accessed
+        soft_deleted:
+          type: boolean
+          description: Soft delete flag
+        is_expired:
+          type: string
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - is_expired
+      - last_accessed
+      - title
+      - updated_at
+    VerifyMFA:
+      type: object
+      properties:
+        uid:
+          type: string
+        token:
+          type: string
+      required:
+      - token
+      - uid
+    VerifyMFAChallenge:
+      type: object
+      properties:
+        code:
+          type: string
+      required:
+      - code
+    VerifyTOTPMFARequest:
+      type: object
+      properties:
+        otp:
+          type: string
+          maxLength: 6
+      required:
+      - otp
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

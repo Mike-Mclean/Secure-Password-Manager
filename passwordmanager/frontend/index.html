@@ -1,0 +1,23 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Secure Password Manager</title>
+
+  <!-- Inject django user info -->
+  <script>
+    window.__USER__ = {
+      isAuthenticated: {{ user_is_authenticated|yesno:"true,false" }},
+      username: "{{ username|escapejs }}",
+    };
+  </script>
+
+  <link rel="stylesheet" href="{% static main_css %}">
+</head>
+<body>
+  <div id="root"></div>
+  <script src="{% static main_js %}"></script>
+</body>
+</html>
